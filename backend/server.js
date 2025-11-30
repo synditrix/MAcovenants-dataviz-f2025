@@ -28,6 +28,8 @@ app.get("/api/health/db", async (req, res) => {
     }
 });
 
+// **** ROUTES FOR DASHBOARD STATISTICS ****
+
 // Route to get total number of system-identified covenants
 app.get("/api/stats/total-system-id-covenants", async (req, res) => {
     try {
@@ -39,10 +41,20 @@ app.get("/api/stats/total-system-id-covenants", async (req, res) => {
     }
 });
 
-// Route to get total number of manually confirmed covenants
+// Route to get total number of manually confirmed covenants (deeds with at least 2 positive reviews and no negative reviews)
 app.get("/api/stats/total-confirmed-covenants", async (req, res) => {
     try {
-        const result = await pool.query("SELECT COUNT(*) FROM deeds WHERE is_restrictive_covenant = true");
+        const result = await pool.query(`
+            SELECT COUNT(*) FROM (
+                SELECT deed_id, 
+                COUNT(*) FILTER (WHERE is_restrictive_covenant = TRUE) as positive_reviews,
+                COUNT(*) FILTER (WHERE is_restrictive_covenant = FALSE) as negative_reviews
+                FROM deed_reviews
+                GROUP BY deed_id
+                HAVING COUNT(*) FILTER (WHERE is_restrictive_covenant = TRUE) >= 2 
+                AND COUNT(*) FILTER (WHERE is_restrictive_covenant = FALSE) = 0
+            )
+        `);
         res.json({ total_confirmed_covenants: result.rows[0].count });
     } catch (err) {
         console.error("Error in /api/stats/total-confirmed-covenants:", err);
@@ -76,13 +88,19 @@ app.get("/api/stats/total_review_requested", async (req, res) => {
     }
 });
 
-// Route to get number of false positive deeds (deeds with at least 1 negative review and no conflicting reviews)
+// Route to get number of false positive deeds (deeds with at least 2 negative reviews and no positive reviews)
 app.get("/api/stats/total_false_positives", async (req, res) => {
     try {
         const result = await pool.query(`
-         SELECT COUNT(*) from deeds d
-             JOIN deed_reviews dr ON d.id = dr.deed_id
-             WHERE dr.is_restrictive_covenant = false
+            SELECT COUNT(*) FROM (
+                SELECT deed_id, 
+                COUNT(*) FILTER (WHERE is_restrictive_covenant = TRUE) as positive_reviews,
+                COUNT(*) FILTER (WHERE is_restrictive_covenant = FALSE) as negative_reviews
+                FROM deed_reviews
+                GROUP BY deed_id
+                HAVING COUNT(*) FILTER (WHERE is_restrictive_covenant = TRUE) = 0 
+                AND COUNT(*) FILTER (WHERE is_restrictive_covenant = FALSE) >= 2
+            )
         `);
         res.json({ total_false_positives: result.rows[0].count });
     } catch (err) {
@@ -90,7 +108,6 @@ app.get("/api/stats/total_false_positives", async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 // /**
 //  * Example: covenants by county
