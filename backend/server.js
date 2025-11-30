@@ -28,6 +28,70 @@ app.get("/api/health/db", async (req, res) => {
     }
 });
 
+// Route to get total number of system-identified covenants
+app.get("/api/stats/total-system-id-covenants", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT COUNT(*) FROM deeds");
+        res.json({ total_system_id_covenants: result.rows[0].count });
+    } catch (err) {
+        console.error("Error in /api/stats/total-system-id-covenants:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Route to get total number of manually confirmed covenants
+app.get("/api/stats/total-confirmed-covenants", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT COUNT(*) FROM deeds WHERE is_restrictive_covenant = true");
+        res.json({ total_confirmed_covenants: result.rows[0].count });
+    } catch (err) {
+        console.error("Error in /api/stats/total-confirmed-covenants:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Route to get total number of pending deed reviews
+app.get("/api/stats/total-pending-reviews", async (req, res) => {
+    try {
+        const result = await pool.query(`
+         SELECT COUNT(*) from deed_reviews WHERE deed_reviews.is_restrictive_covenant IS NULL
+        `);
+        res.json({ total_pending_reviews: result.rows[0].count });
+    } catch (err) {
+        console.error("Error in /api/stats/total-pending-reviews:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Route to get number of deeds with review requested
+app.get("/api/stats/total_review_requested", async (req, res) => {
+    try {
+        const result = await pool.query(`
+         SELECT COUNT(*) from deed_reviews WHERE deed_reviews.review_required = true
+        `);
+        res.json({ total_review_requested: result.rows[0].count });
+    } catch (err) {
+        console.error("Error in /api/stats/total-review_requested:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Route to get number of false positive deeds (deeds with at least 1 negative review and no conflicting reviews)
+app.get("/api/stats/total_false_positives", async (req, res) => {
+    try {
+        const result = await pool.query(`
+         SELECT COUNT(*) from deeds d
+             JOIN deed_reviews dr ON d.id = dr.deed_id
+             WHERE dr.is_restrictive_covenant = false
+        `);
+        res.json({ total_false_positives: result.rows[0].count });
+    } catch (err) {
+        console.error("Error in /api/stats/total-false-positives", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 // /**
 //  * Example: covenants by county
 //  * You WILL need to adjust table/column names to match your schema.
