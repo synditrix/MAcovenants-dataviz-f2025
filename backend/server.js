@@ -165,46 +165,76 @@ app.get("/api/stats/top_grantors_regex", async (req, res) => {
     }
 });
 
-// potential todo if i have time - actually not counting dupes of the same deed
+// regex but counting by DISTINCT deed IDs to try to get closer to # of deeds rather than deed reviews
+app.get("/api/stats/top_grantors_regex_dedupe", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            WITH normalized AS (SELECT deed_id, grantors,
+                                       initcap(
+                                               regexp_replace(
+                                                       regexp_replace(
+                                                               regexp_replace(
+                                                                       regexp_replace(
+                                                                               regexp_replace(
+                                                                                       lower(trim(grantors)),
+                                                                                       '^\\s*the\\s+', '', 'i'
+                                                                               ),
+                                                                               '\\s*(;|,| and | & ).*$', '', 'i'
+                                                                       ),
+                                                                       '\\.', '', 'g'
+                                                               ),
+                                                               '\\s+(company|co|co\\.|incorporated|inc|inc\\.|corp|corp\\.|corporation|co-?operative|cooperative|trust|society|bank|shore?s|improvement\\s+society)\\s*$',
+                                                               '', 'i'
+                                                       ),
+                                                       '\\s+', ' ', 'g'
+                                               )
+                                       ) AS normalized_grantor
+                                FROM deed_reviews)
+            SELECT normalized_grantor, COUNT(DISTINCT deed_id) AS deed_count
+            FROM normalized
+            WHERE normalized_grantor IS NOT NULL
+            GROUP BY normalized_grantor
+            ORDER BY deed_count DESC
+        `);
+        res.json({ top_grantors_regex_dedupe: result });
+    } catch (err) {
+        console.error("Error in /api/stats/top_grantors_regex_dedupe:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
+// Route to get top exclusion types (pre-identified on deed, not through deed review)
+app.get("/api/stats/top_exclusion_types", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT et.title, COUNT(*) FROM deed_exclusion_types det
+            JOIN exclusion_types et on det.exclusion_type_id = et.id
+            GROUP BY et.id ORDER BY COUNT(*) DESC
+        `);
+        res.json({ top_exclusion_types: result });
+    } catch (err) {
+        console.error("Error in /api/stats/top_exclusion_types:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
-
-// /**
-//  * Example: covenants by county
-//  * You WILL need to adjust table/column names to match your schema.
-//  * Open pgAdmin → your DB → public → deeds and check columns.
-//  *
-//  * Assumptions here:
-//  *   - table: deeds
-//  *   - columns:
-//  *       county (text or varchar)
-//  *       has_covenant (boolean)   <-- change this if your column is named differently
-//  */
-// app.get("/api/stats/covenants-by-county", async (req, res) => {
-//     try {
-//         const result = await pool.query(`
-//       SELECT
-//         county,
-//         COUNT(*) AS total_deeds,
-//         SUM(CASE WHEN has_covenant THEN 1 ELSE 0 END) AS covenant_deeds
-//       FROM deeds
-//       GROUP BY county
-//       ORDER BY covenant_deeds DESC;
-//     `);
-//
-//         // Convert string counts to numbers for frontend convenience
-//         const rows = result.rows.map((r) => ({
-//             county: r.county,
-//             total_deeds: Number(r.total_deeds),
-//             covenant_deeds: Number(r.covenant_deeds),
-//         }));
-//
-//         res.json(rows);
-//     } catch (err) {
-//         console.error("Error in /api/stats/covenants-by-county:", err);
-//         res.status(500).json({ error: err.message });
-//     }
-// });
+// Route to get top exclusion types (through deed review)
+app.get("/api/stats/top_exclusion_types_deed_review", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT et.title, COUNT(DISTINCT dr.deed_id) AS deed_count
+            FROM deed_review_exclusion_types dret
+                     JOIN exclusion_types et on dret.exclusion_type_id = et.id
+                     JOIN deed_reviews dr on dret.deed_review_id = dr.id
+            GROUP BY et.id
+            ORDER BY COUNT(*) DESC
+        `);
+        res.json({ top_exclusion_types_deed_review: result });
+    } catch (err) {
+        console.error("Error in /api/stats/top_exclusion_type_deed_review:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.listen(PORT, () => {
     console.log(`API listening on http://localhost:${PORT}`);
