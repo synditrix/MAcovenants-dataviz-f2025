@@ -166,6 +166,7 @@ app.get("/api/stats/top_grantors_regex", async (req, res) => {
 });
 
 // regex but counting by DISTINCT deed IDs to try to get closer to # of deeds rather than deed reviews
+// limits to top 20 for readability
 app.get("/api/stats/top_grantors_regex_dedupe", async (req, res) => {
     try {
         const result = await pool.query(`
@@ -195,6 +196,7 @@ app.get("/api/stats/top_grantors_regex_dedupe", async (req, res) => {
             WHERE normalized_grantor IS NOT NULL
             GROUP BY normalized_grantor
             ORDER BY deed_count DESC
+            LIMIT 20
         `);
         res.json({ top_grantors_regex_dedupe: result });
     } catch (err) {

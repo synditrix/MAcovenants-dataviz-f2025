@@ -61,8 +61,8 @@ export function StatsOverview() {
         <div className="stats-row">
             {items.map((item) => (
                 <div key={item.label} className="stat-card">
-                    <div className="stat-label">{item.label}</div>
                     <div className="stat-value">{formatNumber(item.value)}</div>
+                    <div className="stat-label">{item.label}</div>
                 </div>
             ))}
         </div>
