@@ -1,10 +1,11 @@
 import './App.css';
 import { StatsOverview } from './components/StatsOverview';
+import { Header } from './components/Header';
 
 function App() {
     return (
         <div style={{ padding: '1.5rem' }}>
-            <header> Overview </header>
+            <Header />
             <StatsOverview />
             {/* later: Recharts components  */}
         </div>

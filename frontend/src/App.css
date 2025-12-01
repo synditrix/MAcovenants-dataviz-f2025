@@ -28,3 +28,14 @@
     font-weight: 600;
     color: #2563eb;
 }
+
+.header {
+    padding: 10px 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 2rem;
+}
+
+
