@@ -109,6 +109,66 @@ app.get("/api/stats/total_false_positives", async (req, res) => {
     }
 });
 
+// **** ROUTES FOR CHARTS ****
+
+// Route to get grantors, sorted DESC by number of deed reviews. This has flaws since it's not counting the number
+// of actual deeds. Also, this is only based on exact string match.
+app.get("/api/stats/top_grantors", async (req, res) => {
+    try {
+        const result = await pool.query(`
+         SELECT grantors, COUNT(*) from deed_reviews WHERE deed_reviews.grantors IS NOT NULL
+         GROUP BY grantors ORDER BY COUNT(*) DESC
+        `);
+        res.json({ top_grantors: result });
+    } catch (err) {
+        console.error("Error in /api/stats/top_grantors:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Route to get grantors, sorted DESC by number of deed reviews. This has flaws since it's not counting the number
+// of actual deeds. Using regex to match similar named grantors though
+app.get("/api/stats/top_grantors_regex", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            WITH normalized AS (SELECT grantors,
+                                       initcap(
+                                               regexp_replace(
+                                                       regexp_replace(
+                                                               regexp_replace(
+                                                                       regexp_replace(
+                                                                               regexp_replace(
+                                                                                       lower(trim(grantors)),
+                                                                                       '^\\s*the\\s+', '', 'i'
+                                                                               ),
+                                                                               '\\s*(;|,| and | & ).*$', '', 'i'
+                                                                       ),
+                                                                       '\\.', '', 'g'
+                                                               ),
+                                                               '\\s+(company|co|co\\.|incorporated|inc|inc\\.|corp|corp\\.|corporation|co-?operative|cooperative|trust|society|bank|shore?s|improvement\\s+society)\\s*$',
+                                                               '', 'i'
+                                                       ),
+                                                       '\\s+', ' ', 'g'
+                                               )
+                                       ) AS normalized_grantor
+                                FROM deed_reviews)
+            SELECT normalized_grantor, COUNT(*) AS deed_count
+            FROM normalized
+            WHERE normalized_grantor IS NOT NULL
+            GROUP BY normalized_grantor
+            ORDER BY deed_count DESC
+        `);
+        res.json({ top_grantors_regex: result });
+    } catch (err) {
+        console.error("Error in /api/stats/top_grantors_regex:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// potential todo if i have time - actually not counting dupes of the same deed
+
+
+
 // /**
 //  * Example: covenants by county
 //  * You WILL need to adjust table/column names to match your schema.
