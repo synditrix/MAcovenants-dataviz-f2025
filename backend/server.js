@@ -228,6 +228,7 @@ app.get("/api/stats/top_exclusion_types_deed_review", async (req, res) => {
             FROM deed_review_exclusion_types dret
                      JOIN exclusion_types et on dret.exclusion_type_id = et.id
                      JOIN deed_reviews dr on dret.deed_review_id = dr.id
+            WHERE dr.is_restrictive_covenant = TRUE
             GROUP BY et.id
             ORDER BY COUNT(*) DESC
         `);
