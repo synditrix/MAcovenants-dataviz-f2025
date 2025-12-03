@@ -2,6 +2,7 @@ import './App.css';
 import { StatsOverview } from './components/StatsOverview';
 import { Header } from './components/Header';
 import TopGrantors from "./components/TopGrantors.jsx";
+import TopExclusionTypes from "./components/TopExclusionTypes.jsx";
 
 function App() {
     return (
@@ -9,6 +10,7 @@ function App() {
             <Header />
             <StatsOverview />
             <TopGrantors />
+            <TopExclusionTypes />
         </div>
     );
 }
