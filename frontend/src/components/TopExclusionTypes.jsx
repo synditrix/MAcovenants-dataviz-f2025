@@ -42,24 +42,24 @@ const TopExclusionTypes = () => {
                 layout="vertical"
                 margin={{
                     bottom: 5,
-                    left: 20,
+                    left: 40,
                     right: 30,
                     top: 8
                 }}
                 syncMethod="index"
-                width={500}
+                width={600}
                 responsive
             >
                 <Bar
                     dataKey="deed_count"
-                    fill="#2563eb"
                 >
                     {topExclusionTypes.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={BAR_CHART_COLORS[index % 20]} />
                     ))}
                     <LabelList
                         dataKey="deed_count"
-                        position="insideLeft"
+                        position="left"
+                        fill='#FFFFFF'
                     />
                     <LabelList
                         dataKey="title"

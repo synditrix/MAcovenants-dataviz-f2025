@@ -16,7 +16,7 @@ function App() {
             <div style={{ minHeight: '100vh' }}>
                  <TopExclusionTypes />
             </div>
-            <div style={{ padding: '1.5rem', background: '#111827', minHeight: '100vh' }}>
+            <div style={{ padding: '1.5rem', minHeight: '100vh' }}>
                 <ExclusionTypeByYear />
             </div>
         </div>
