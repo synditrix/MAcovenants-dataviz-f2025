@@ -288,6 +288,17 @@ app.get('/api/exclusions/time-series', async (req, res) => {
     }
 });
 
+// Route to get all exclusion types
+app.get("/api/stats/exclusion_types", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT id, title FROM exclusion_types")
+        res.json({ exclusion_types: result });
+    } catch (err) {
+        console.error("Error in /api/stats/exclusion_types:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`API listening on http://localhost:${PORT}`);
 });
