@@ -29,6 +29,7 @@ const TopExclusionTypes = () => {
 
     return (
         <div style={{ width: '100%', height: 800 }}>
+            <h2 style={{ margin: 0 }}>Top Exclusion Types</h2>
         <ResponsiveContainer
             height="100%"
             width="100%"

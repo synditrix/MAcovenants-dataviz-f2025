@@ -28,6 +28,7 @@ const TopGrantors = () => {
 
     return (
         <div style={{ width: '100%', height: 600 }}>
+            <h2 style={{ margin: 0 }}>Top Grantors</h2>
         <ResponsiveContainer
             height="100%"
             width="100%"
