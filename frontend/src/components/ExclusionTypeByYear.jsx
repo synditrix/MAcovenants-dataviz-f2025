@@ -12,9 +12,12 @@ import {
 import FilterModal from './FilterModal';
 import {DISTINCT_COLORS} from '../utils.js'
 
+const COUNTIES = ["Worcester", "Norfolk_LR", "Northern Middlesex"];
+
 function ExclusionTypeByYear() {
     const [allTypes, setAllTypes] = useState([]);        // [{id, title}]
     const [selectedTypeIds, setSelectedTypeIds] = useState([]); // strings
+    const [selectedCounties, setSelectedCounties] = useState(COUNTIES);
     const [yearRange, setYearRange] = useState({ start: 1800, end: 1970 });
 
     const [rows, setRows] = useState([]); // raw time-series rows from API
@@ -49,6 +52,9 @@ function ExclusionTypeByYear() {
                 params.set('types', selectedTypeIds.join(','));
                 params.set('startYear', yearRange.start);
                 params.set('endYear', yearRange.end);
+                if (selectedCounties.length) {
+                    params.set('county', selectedCounties.join(','));
+                }
 
                 const res = await fetch(`/api/exclusions/time-series?${params.toString()}`);
                 const data = await res.json();
@@ -59,6 +65,7 @@ function ExclusionTypeByYear() {
                         exclusionTypeId: String(d.exclusionTypeId),
                         title: d.title,
                         deedCount: Number(d.deedCount),
+                        county: d.county
                     })),
                 );
             } catch (err) {
@@ -68,7 +75,7 @@ function ExclusionTypeByYear() {
             }
         }
         fetchTimeSeries();
-    }, [selectedTypeIds, yearRange.start, yearRange.end]);
+    }, [selectedTypeIds, yearRange.start, yearRange.end, selectedCounties]);
 
     // ---- Transform to Recharts "wide" format ----
     const { chartData, seriesMeta } = useMemo(() => {
@@ -108,9 +115,10 @@ function ExclusionTypeByYear() {
     }, [rows]);
 
     // ---- Handle Apply from modal ----
-    const handleApplyFilters = (nextSelectedTypes, nextYearRange) => {
+    const handleApplyFilters = (nextSelectedTypes, nextYearRange, nextCounties) => {
         setSelectedTypeIds(nextSelectedTypes);
         setYearRange(nextYearRange);
+        setSelectedCounties(nextCounties);
         setFilterOpen(false);
     };
 
@@ -186,6 +194,7 @@ function ExclusionTypeByYear() {
                 allTypes={allTypes}
                 selectedTypeIds={selectedTypeIds}
                 yearRange={yearRange}
+                selectedCounties={selectedCounties}
                 onApply={handleApplyFilters}
             />
         </div>

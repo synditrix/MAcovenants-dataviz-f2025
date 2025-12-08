@@ -27,18 +27,24 @@ function FilterModal({
                          allTypes,
                          selectedTypeIds,
                          yearRange,
+                         selectedCounties,
                          onApply,
                      }) {
     const [localSelectedTypes, setLocalSelectedTypes] = useState([]);
     const [localYearRange, setLocalYearRange] = useState(yearRange);
+    const [localCounties, setLocalCounties] = useState(COUNTIES);
     const [typesDropdownOpen, setTypesDropdownOpen] = useState(false);
+    const [countiesDropdownOpen, setCountiesDropdownOpen] = useState(false);
 
     // Sync local state when modal opens / props change
     useEffect(() => {
         if (!open) return;
         setLocalSelectedTypes(selectedTypeIds);
         setLocalYearRange(yearRange);
-    }, [open, selectedTypeIds, yearRange]);
+        setLocalCounties(
+            selectedCounties && selectedCounties.length ? selectedCounties : COUNTIES
+        )
+    }, [open, selectedTypeIds, yearRange, selectedCounties]);
 
     if (!open) return null;
 
@@ -46,6 +52,18 @@ function FilterModal({
         setLocalSelectedTypes((prev) =>
             prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
         );
+    };
+
+    const toggleCounty = (name) => {
+        setLocalCounties((prev) => {
+            const exists = prev.includes(name);
+            if (exists) {
+                const next = prev.filter((c) => c !== name);
+                // Don’t allow “none selected” – fall back to all
+                return next.length === 0 ? COUNTIES : next;
+            }
+            return [...prev, name];
+        });
     };
 
     const handleYearChange = (field, value) => {
@@ -63,8 +81,18 @@ function FilterModal({
         return `${localSelectedTypes.length} exclusion types selected`;
     })();
 
+    const selectedCountiesLabel = (() => {
+        if (!localCounties.length || localCounties.length === COUNTIES.length) {
+            return 'All counties';
+        }
+        if (localCounties.length === 1) {
+            return `County: ${localCounties[0]}`;
+        }
+        return `${localCounties.length} counties selected`;
+    })();
+
     const handleApplyClick = () => {
-        onApply(localSelectedTypes, localYearRange);
+        onApply(localSelectedTypes, localYearRange, localCounties);
     };
 
     return (
@@ -94,11 +122,52 @@ function FilterModal({
                                 border: '1px solid #d1d5db',
                                 padding: '0.4rem 0.7rem',
                                 fontSize: '0.85rem',
-                                color: '#9ca3af',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                cursor: 'pointer',
                             }}
+                            onClick={() => setCountiesDropdownOpen((o) => !o)}
                         >
-                            (Not implemented yet)
+                            <span>{selectedCountiesLabel}</span>
+                            <span style={{ fontSize: '0.7rem' }}>{countiesDropdownOpen ? '▴' : '▾'}</span>
                         </div>
+                        {countiesDropdownOpen && (
+                            <div
+                                style={{
+                                    marginTop: 4,
+                                    borderRadius: 8,
+                                    border: '1px solid #e5e7eb',
+                                    maxHeight: 180,
+                                    overflowY: 'auto',
+                                }}
+                            >
+                                {COUNTIES.map((name) => {
+                                    const checked = localCounties.includes(name);
+                                    return (
+                                        <label
+                                            key={name}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 8,
+                                                padding: '0.45rem 0.7rem',
+                                                fontSize: '0.85rem',
+                                                cursor: 'pointer',
+                                                color: '#4b5563',
+                                            }}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={checked}
+                                                onChange={() => toggleCounty(name)}
+                                            />
+                                            {name}
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
                     {/* Exclusion Types dropdown */}
