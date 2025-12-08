@@ -143,6 +143,7 @@ function FilterModal({
                                                 padding: '0.45rem 0.7rem',
                                                 fontSize: '0.85rem',
                                                 cursor: 'pointer',
+                                                color: '#9ca3af',
                                             }}
                                         >
                                             <input
