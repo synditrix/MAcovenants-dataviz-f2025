@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState} from 'react';
 import {
     Bar,
     BarChart,
@@ -28,9 +28,9 @@ function ExclusionTypeByYear() {
             try {
                 const res = await fetch('/api/stats/exclusion_types');
                 const data = await res.json(); // [{id, title}, ...]
-                setAllTypes(data.exclusion_types.rows);
+                setAllTypes(data.exclusion_types);
                 // default: select all
-                setSelectedTypeIds(data.map((t) => String(t.id)));
+                setSelectedTypeIds(data.exclusion_types.map((t) => String(t.id)));
             } catch (err) {
                 console.error('Error fetching exclusion types', err);
             }
@@ -143,6 +143,8 @@ function ExclusionTypeByYear() {
                         display: 'flex',
                         alignItems: 'center',
                         gap: 6,
+                        color: '#6b7280',
+                        fontWeight: 500,
                     }}
                 >
                     Filters ▾
@@ -150,7 +152,7 @@ function ExclusionTypeByYear() {
             </div>
 
             {/* Chart */}
-            <div style={{ width: '100%', height: 360, background: '#ffffff', borderRadius: 12 }}>
+            <div style={{ width: '100%', height: 800, background: '#ffffff', borderRadius: 12 }}>
                 {loading ? (
                     <p style={{ padding: '1rem' }}>Loading…</p>
                 ) : !chartData.length ? (

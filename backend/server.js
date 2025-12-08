@@ -292,7 +292,7 @@ app.get('/api/exclusions/time-series', async (req, res) => {
 app.get("/api/stats/exclusion_types", async (req, res) => {
     try {
         const result = await pool.query("SELECT id, title FROM exclusion_types")
-        res.json({ exclusion_types: result });
+        res.json({ exclusion_types: result.rows });
     } catch (err) {
         console.error("Error in /api/stats/exclusion_types:", err);
         res.status(500).json({ error: err.message });
