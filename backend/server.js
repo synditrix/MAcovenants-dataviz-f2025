@@ -231,6 +231,7 @@ app.get("/api/stats/top_exclusion_types_deed_review", async (req, res) => {
             WHERE dr.is_restrictive_covenant = TRUE
             GROUP BY et.id
             ORDER BY COUNT(*) DESC
+            LIMIT 20
         `);
         res.json({ top_exclusion_types_deed_review: result });
     } catch (err) {

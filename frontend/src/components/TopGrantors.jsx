@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import {Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis} from "recharts";
+import {Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis} from "recharts";
+import {BAR_CHART_COLORS} from '../utils.js'
 
 const TopGrantors = () => {
     const [topGrantors, setTopGrantors] = useState([]);
@@ -26,7 +27,7 @@ const TopGrantors = () => {
     if (loading) return <p>Loading...</p>;
 
     return (
-        <div style={{ width: '100%', height: 400 }}>
+        <div style={{ width: '100%', height: 600 }}>
         <ResponsiveContainer
             height="100%"
             width="100%"
@@ -46,11 +47,15 @@ const TopGrantors = () => {
                 }}
                 syncMethod="index"
                 width={500}
+                responsive
             >
                 <Bar
                     dataKey="deed_count"
                     fill="#2563eb"
                 >
+                    {topGrantors.map((_entry, index) => (
+                        <Cell key={`cell-${index}`} fill={BAR_CHART_COLORS[index % 20]} />
+                    ))}
                     <LabelList
                         dataKey="deed_count"
                         position="insideLeft"

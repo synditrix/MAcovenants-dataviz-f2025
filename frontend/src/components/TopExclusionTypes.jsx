@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import {Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis} from "recharts";
+import {Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis} from "recharts";
+import {BAR_CHART_COLORS} from '../utils.js'
 
 // TODO refactor this and topgrantors to be a reusable component just with different data
 const TopExclusionTypes = () => {
@@ -27,7 +28,7 @@ const TopExclusionTypes = () => {
     if (loading) return <p>Loading...</p>;
 
     return (
-        <div style={{ width: '100%', height: 400 }}>
+        <div style={{ width: '100%', height: 800 }}>
         <ResponsiveContainer
             height="100%"
             width="100%"
@@ -43,15 +44,19 @@ const TopExclusionTypes = () => {
                     bottom: 5,
                     left: 20,
                     right: 30,
-                    top: 5
+                    top: 8
                 }}
                 syncMethod="index"
                 width={500}
+                responsive
             >
                 <Bar
                     dataKey="deed_count"
                     fill="#2563eb"
                 >
+                    {topExclusionTypes.map((_entry, index) => (
+                        <Cell key={`cell-${index}`} fill={BAR_CHART_COLORS[index % 20]} />
+                    ))}
                     <LabelList
                         dataKey="deed_count"
                         position="insideLeft"
@@ -59,6 +64,7 @@ const TopExclusionTypes = () => {
                     <LabelList
                         dataKey="title"
                         position="right"
+                        offset="19"
                     />
                 </Bar>
                 <XAxis

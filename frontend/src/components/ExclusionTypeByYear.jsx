@@ -10,8 +10,7 @@ import {
     YAxis,
 } from 'recharts';
 import FilterModal from './FilterModal';
-
-const SERIES_COLORS = ['#0f766e', '#1d4ed8', '#22c55e', '#f97316', '#a855f7'];
+import {DISTINCT_COLORS} from '../utils.js'
 
 function ExclusionTypeByYear() {
     const [allTypes, setAllTypes] = useState([]);        // [{id, title}]
@@ -29,8 +28,6 @@ function ExclusionTypeByYear() {
                 const res = await fetch('/api/stats/exclusion_types');
                 const data = await res.json(); // [{id, title}, ...]
                 setAllTypes(data.exclusion_types);
-                // default: select all
-                setSelectedTypeIds(data.exclusion_types.map((t) => String(t.id)));
             } catch (err) {
                 console.error('Error fetching exclusion types', err);
             }
@@ -83,12 +80,12 @@ function ExclusionTypeByYear() {
         rows.forEach((r) => {
             years.add(r.year);
             if (!typeMap.has(r.exclusionTypeId)) {
-                const idx = typeMap.size % SERIES_COLORS.length;
+                const idx = typeMap.size % DISTINCT_COLORS.length;
                 typeMap.set(r.exclusionTypeId, {
                     id: r.exclusionTypeId,
                     key: `type_${r.exclusionTypeId}`,
                     title: r.title,
-                    color: SERIES_COLORS[idx],
+                    color: DISTINCT_COLORS[idx],
                 });
             }
         });

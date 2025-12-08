@@ -10,8 +10,12 @@ function App() {
         <div style={{ padding: '1.5rem' }}>
             <Header />
             <StatsOverview />
-            <TopGrantors />
-            <TopExclusionTypes />
+            <div style={{ padding: '0.1rem', minHeight: '100vh' }}>
+                <TopGrantors />
+            </div>
+            <div style={{ minHeight: '100vh' }}>
+                 <TopExclusionTypes />
+            </div>
             <div style={{ padding: '1.5rem', background: '#111827', minHeight: '100vh' }}>
                 <ExclusionTypeByYear />
             </div>
