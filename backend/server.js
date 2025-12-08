@@ -241,10 +241,10 @@ app.get("/api/stats/top_exclusion_types_deed_review", async (req, res) => {
 });
 
 // Route to get counts of exclusion types per year
-// GET /api/exclusions/time-series?types=1,2,5&startYear=1800&endYear=1970
+// GET /api/exclusions/time-series?types=1,2,5&startYear=1800&endYear=1970&county=Worcester
 app.get('/api/exclusions/time-series', async (req, res) => {
     try {
-        const { types, startYear, endYear } = req.query;
+        const { types, startYear, endYear, county } = req.query;
 
         const typeIds = types
             ? types.split(',').map((t) => parseInt(t, 10)).filter(Boolean)
@@ -252,6 +252,8 @@ app.get('/api/exclusions/time-series', async (req, res) => {
 
         const start = startYear ? parseInt(startYear, 10) : 1800;
         const end   = endYear   ? parseInt(endYear, 10)   : 1970;
+        const counties = county
+            ? county.split(',') : ['Worcester', 'Norfolk_LR', 'Northern Middlesex'];
 
         const sql = `
       WITH per_deed_exclusion AS (
@@ -259,7 +261,8 @@ app.get('/api/exclusions/time-series', async (req, res) => {
           dr.deed_id,
           et.id   AS exclusion_type_id,
           et.title,
-          EXTRACT(YEAR FROM dr.deed_date)::int AS year
+          EXTRACT(YEAR FROM dr.deed_date)::int AS year,
+          bp.county
         FROM deed_review_exclusion_types AS dret
         JOIN exclusion_types AS et
           ON dret.exclusion_type_id = et.id
@@ -267,21 +270,27 @@ app.get('/api/exclusions/time-series', async (req, res) => {
           ON dret.deed_review_id = dr.id
         JOIN deeds AS d
           ON dr.deed_id = d.id
+        JOIN deed_review_book_pages drbp
+          ON dr.id = drbp.deed_review_id
+        JOIN book_pages bp 
+          ON bp.id = drbp.book_page_id
         WHERE
           (cardinality($1::int[]) = 0 OR et.id = ANY($1::int[]))
           AND EXTRACT(YEAR FROM dr.deed_date)::int BETWEEN $2 AND $3
+          AND (cardinality($4::text[]) = 0 OR bp.county = ANY($4::text[]))  
       )
       SELECT
         year,
         exclusion_type_id AS "exclusionTypeId",
         title,
+        county,
         COUNT(*) AS "deedCount"
       FROM per_deed_exclusion
-      GROUP BY year, exclusion_type_id, title
+      GROUP BY year, exclusion_type_id, title, county
       ORDER BY year, exclusion_type_id;
     `;
 
-        const { rows } = await pool.query(sql, [typeIds, start, end]);
+        const { rows } = await pool.query(sql, [typeIds, start, end, counties]);
         res.json(rows);
     } catch (err) {
         console.error(err);

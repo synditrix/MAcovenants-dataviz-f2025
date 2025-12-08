@@ -44,7 +44,7 @@ const TopExclusionTypes = () => {
                     bottom: 5,
                     left: 40,
                     right: 30,
-                    top: 8
+                    top: 5
                 }}
                 syncMethod="index"
                 width={600}

@@ -19,6 +19,8 @@ const modalStyle = {
     boxShadow: '0 25px 50px rgba(15, 23, 42, 0.25)',
 };
 
+const COUNTIES = ["Worcester", "Norfolk_LR", "Northern Middlesex"];
+
 function FilterModal({
                          open,
                          onClose,
@@ -82,7 +84,7 @@ function FilterModal({
 
                 {/* Fields */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {/* Counties placeholder */}
+                    {/* Counties dropdown */}
                     <div>
                         <label style={{ fontSize: '0.8rem', color: '#6b7280' }}>Counties</label>
                         <div
