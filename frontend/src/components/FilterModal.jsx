@@ -1,23 +1,13 @@
 import { useEffect, useState } from 'react';
 
-const overlayStyle = {
-    position: 'fixed',
-    inset: 0,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 50,
-};
-
-const modalStyle = {
-    width: 480,
-    maxWidth: '90vw',
-    backgroundColor: '#ffffff',
-    borderRadius: 18,
-    padding: '1.5rem',
-    boxShadow: '0 25px 50px rgba(15, 23, 42, 0.25)',
-};
+// const modalStyle = {
+//     width: 480,
+//     maxWidth: '90vw',
+//     backgroundColor: '#ffffff',
+//     borderRadius: 18,
+//     padding: '1.5rem',
+//     boxShadow: '0 25px 50px rgba(15, 23, 42, 0.25)',
+// };
 
 const COUNTIES = ["Worcester", "Norfolk_LR", "Northern Middlesex"];
 
@@ -96,9 +86,8 @@ function FilterModal({
     };
 
     return (
-        <div style={overlayStyle} onClick={onClose}>
-            <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
-                {/* Header */}
+        <div className="overlay-style" onClick={onClose}>
+            <div className="modal-style" onClick={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <h3 style={{ margin: 0 }}>Filters</h3>
                     <button
@@ -110,9 +99,7 @@ function FilterModal({
                     </button>
                 </div>
 
-                {/* Fields */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {/* Counties dropdown */}
                     <div>
                         <label style={{ fontSize: '0.8rem', color: '#6b7280' }}>Counties</label>
                         <div
@@ -170,7 +157,6 @@ function FilterModal({
                         )}
                     </div>
 
-                    {/* Exclusion Types dropdown */}
                     <div>
                         <label style={{ fontSize: '0.8rem', color: '#6b7280' }}>Exclusion Types</label>
                         <div
@@ -230,7 +216,6 @@ function FilterModal({
                         )}
                     </div>
 
-                    {/* Date range */}
                     <div>
                         <label style={{ fontSize: '0.8rem', color: '#6b7280' }}>Date Range</label>
                         <div
@@ -261,7 +246,6 @@ function FilterModal({
                     </div>
                 </div>
 
-                {/* Apply button */}
                 <button
                     type="button"
                     onClick={handleApplyClick}

@@ -38,4 +38,23 @@
     font-size: 2rem;
 }
 
+.overlay-style {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+
+.modal-style {
+    width: 480px;
+    max-width: 90vw;
+    background-color: #ffffff;
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: 0 25px 50px rgba(15, 23, 42, 0.25);
+}
+
 
