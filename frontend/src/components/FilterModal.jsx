@@ -39,9 +39,7 @@ function FilterModal({
         setLocalCounties((prev) => {
             const exists = prev.includes(name);
             if (exists) {
-                const next = prev.filter((c) => c !== name);
-                // Don’t allow “none selected” – fall back to all
-                return next;
+                return prev.filter((c) => c !== name);
             }
             return [...prev, name];
         });

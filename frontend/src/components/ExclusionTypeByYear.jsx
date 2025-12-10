@@ -15,8 +15,8 @@ import {DISTINCT_COLORS} from '../utils.js'
 const COUNTIES = ["Worcester", "Norfolk_LR", "Northern Middlesex"];
 
 function ExclusionTypeByYear() {
-    const [allTypes, setAllTypes] = useState([]);        // [{id, title}]
-    const [selectedTypeIds, setSelectedTypeIds] = useState([]); // strings
+    const [allTypes, setAllTypes] = useState([]);
+    const [selectedTypeIds, setSelectedTypeIds] = useState([]);
     const [selectedCounties, setSelectedCounties] = useState(COUNTIES);
     const [yearRange, setYearRange] = useState({ start: 1800, end: 1970 });
 
@@ -24,12 +24,12 @@ function ExclusionTypeByYear() {
     const [loading, setLoading] = useState(false);
     const [filterOpen, setFilterOpen] = useState(false);
 
-    // ---- Load all exclusion types once (for dropdown) ----
+    // load exclusion types for dropdown
     useEffect(() => {
         async function fetchTypes() {
             try {
                 const res = await fetch('/api/stats/exclusion_types');
-                const data = await res.json(); // [{id, title}, ...]
+                const data = await res.json();
                 setAllTypes(data.exclusion_types);
             } catch (err) {
                 console.error('Error fetching exclusion types', err);
@@ -38,7 +38,7 @@ function ExclusionTypeByYear() {
         fetchTypes();
     }, []);
 
-    // ---- Fetch time-series whenever filters change ----
+    // when filters change, fetch time series
     useEffect(() => {
         if (!selectedTypeIds.length) {
             setRows([]);
@@ -77,12 +77,12 @@ function ExclusionTypeByYear() {
         fetchTimeSeries();
     }, [selectedTypeIds, yearRange.start, yearRange.end, selectedCounties]);
 
-    // ---- Transform to Recharts "wide" format ----
+    // transform to recharts wide format
     const { chartData, seriesMeta } = useMemo(() => {
         if (!rows.length) return { chartData: [], seriesMeta: [] };
 
         const years = new Set();
-        const typeMap = new Map(); // id -> series metadata
+        const typeMap = new Map();
 
         rows.forEach((r) => {
             years.add(r.year);
@@ -114,7 +114,7 @@ function ExclusionTypeByYear() {
         };
     }, [rows]);
 
-    // ---- Handle Apply from modal ----
+    // handler for apply button on filter modal
     const handleApplyFilters = (nextSelectedTypes, nextYearRange, nextCounties) => {
         setSelectedTypeIds(nextSelectedTypes);
         setYearRange(nextYearRange);
@@ -124,7 +124,6 @@ function ExclusionTypeByYear() {
 
     return (
         <div style={{ padding: '1.5rem' }}>
-            {/* Header + Filters button */}
             <div
                 style={{
                     display: 'flex',
@@ -156,7 +155,6 @@ function ExclusionTypeByYear() {
                 </button>
             </div>
 
-            {/* Chart */}
             <div style={{ width: '100%', height: 800, background: '#ffffff', borderRadius: 12 }}>
                 {loading ? (
                     <p style={{ padding: '1rem' }}>Loading…</p>
@@ -187,7 +185,6 @@ function ExclusionTypeByYear() {
                 )}
             </div>
 
-            {/* Modal */}
             <FilterModal
                 open={filterOpen}
                 onClose={() => setFilterOpen(false)}

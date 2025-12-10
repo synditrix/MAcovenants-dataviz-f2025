@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis} from "recharts";
 import {BAR_CHART_COLORS} from '../utils.js'
 
+// TODO refactor this and topexclusiontypes to be a reusable component just with different data
 const TopGrantors = () => {
     const [topGrantors, setTopGrantors] = useState([]);
     const [loading, setLoading] = useState(true);
