@@ -1,4 +1,3 @@
-// db.js
 import pkg from "pg";
 import dotenv from "dotenv";
 
@@ -13,7 +12,7 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD,
 });
 
-// Optional: basic startup test + nice error logging
+// startup test + error logging
 pool.on("error", (err) => {
     console.error("Unexpected PG client error", err);
 });

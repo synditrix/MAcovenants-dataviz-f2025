@@ -1,4 +1,3 @@
-// src/components/StatsOverview.jsx
 import { useEffect, useState } from 'react';
 
 function formatNumber(n) {
