@@ -1,14 +1,5 @@
 import { useEffect, useState } from 'react';
 
-// const modalStyle = {
-//     width: 480,
-//     maxWidth: '90vw',
-//     backgroundColor: '#ffffff',
-//     borderRadius: 18,
-//     padding: '1.5rem',
-//     boxShadow: '0 25px 50px rgba(15, 23, 42, 0.25)',
-// };
-
 const COUNTIES = ["Worcester", "Norfolk_LR", "Northern Middlesex"];
 
 function FilterModal({
@@ -50,7 +41,7 @@ function FilterModal({
             if (exists) {
                 const next = prev.filter((c) => c !== name);
                 // Don’t allow “none selected” – fall back to all
-                return next.length === 0 ? COUNTIES : next;
+                return next;
             }
             return [...prev, name];
         });
